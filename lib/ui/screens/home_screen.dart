@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -62,8 +63,12 @@ class HomeScreen extends StatelessWidget {
         GestureDetector(
           onTap: () {},
           child: CircleAvatar(
-            radius: 22,
-            backgroundImage: NetworkImage('https://avatars.githubusercontent.com/u/180717493?s=400&u=eeb63082d5b58b988e8dd533ef828d3ddf5aa085&v=4'),
+            radius: 26,
+            backgroundColor: Colors.transparent,
+            child: SvgPicture.asset(
+                'assets/svg/toolbox.svg',
+                fit: BoxFit.cover,
+              ),
           ),
         )
       ],

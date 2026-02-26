@@ -21,6 +21,7 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   google_fonts: ^8.0.2
+  flutter_svg: ^2.0.10
 
 dev_dependencies:
   flutter_test:
@@ -35,10 +36,9 @@ flutter_launcher_icons:
 
 flutter:
   uses-material-design: true
-
-
-assets:
-  - assets/images/
+  assets:
+    - assets/images/
+    - assets/svg/    
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
