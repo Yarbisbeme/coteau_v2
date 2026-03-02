@@ -24,9 +24,10 @@ class AppTheme {
         ),
       ),
       textTheme: TextTheme(
-        titleLarge: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
-        titleMedium: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16),
+        titleLarge: GoogleFonts.inter(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 32, letterSpacing: -1),
+        titleMedium: GoogleFonts.inter(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 16),
         bodyMedium: GoogleFonts.inter(color: const Color(0xFFA0A0A0), fontSize: 14), // Texto secundario gris
+        titleSmall: GoogleFonts.inter(color: Colors.grey[600], fontSize: 11),
       ),
       useMaterial3: true,
     );
