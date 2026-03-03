@@ -1,7 +1,7 @@
 import 'dart:convert';
+import 'package:coteau_v2/models/Weather_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import '../models/wp_post_model.dart'; // Verifica que aquí esté la clase Weather
 import 'package:geolocator/geolocator.dart';
 
 class WeatherService {

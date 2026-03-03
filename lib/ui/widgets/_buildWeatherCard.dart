@@ -1,5 +1,5 @@
 
-import 'package:coteau_v2/models/wp_post_model.dart';
+import 'package:coteau_v2/models/Weather_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 

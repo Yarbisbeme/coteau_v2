@@ -1,25 +1,42 @@
-class Weather {
-  final String cityName;
-  final double temperature;
-  final double h;
-  final double l;
-  final String mainCondition;
+class WpPost {
+  final int id;
+  final String title;
+  final String excerpt;
+  final String content;
+  final String featuredImageUrl;
+  final String date;
+  final String authorName;
 
-  Weather({
-    required this.cityName,
-    required this.temperature,
-    required this.h,
-    required this.l,
-    required this.mainCondition,
+  WpPost({
+    required this.id,
+    required this.title,
+    required this.excerpt,
+    required this.content,
+    required this.featuredImageUrl,
+    required this.date,
+    required this.authorName,
   });
 
-  factory Weather.fromJson(Map<String, dynamic> json) {
-    return Weather(
-      cityName: json['name'],
-      temperature: json['main']['temp'].toDouble(),
-      h:json['main']['temp_max'].toDouble(),
-      l:json['main']['temp_min'].toDouble(),
-      mainCondition: json['weather'][0]['main'],
+  factory WpPost.fromJson(Map<String, dynamic> json) {
+    // Extraemos la imagen de la estructura _embedded de WordPress
+    String imageUrl = 'https://via.placeholder.com/600x400'; 
+    if (json['_embedded'] != null && 
+        json['_embedded']['wp:featuredmedia'] != null) {
+      imageUrl = json['_embedded']['wp:featuredmedia'][0]['source_url'];
+    }
+
+    // Limpiamos las etiquetas HTML del extracto (excerpt)
+    String cleanExcerpt = json['excerpt']['rendered']
+        .replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), '');
+
+    return WpPost(
+      id: json['id'],
+      title: json['title']['rendered'] ?? 'Sin título',
+      excerpt: cleanExcerpt,
+      content: json['content']['rendered'] ?? '',
+      featuredImageUrl: imageUrl,
+      date: json['date'].toString().split('T')[0], // Solo la fecha YYYY-MM-DD
+      authorName: json['_embedded']?['author']?[0]?['name'] ?? 'Admin',
     );
   }
 }
