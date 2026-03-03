@@ -90,8 +90,8 @@ class WeatherCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
-                'H: 75° L: 60°', // Puedes mapear estos desde la API si quieres
+              Text(
+                'H: ${weather.h.round()}° L: ${weather.l.round()}°', // Puedes mapear estos desde la API si quieres
                 style: TextStyle(color: Colors.white60, fontSize: 14),
               ),
             ],
@@ -102,8 +102,8 @@ class WeatherCard extends StatelessWidget {
             bottom: 30,
             child: Lottie.asset(
               getWeatherAnimation(weather.mainCondition),
-              width: 120,
-              height: 120,
+              width: 130,
+              height: 130,
             ),
           ),
           // Botón "Updated Now"

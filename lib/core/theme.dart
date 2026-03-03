@@ -15,6 +15,7 @@ class AppTheme {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
+      dividerColor: Colors.black54,
       // CORRECCIÓN: Usamos CardThemeData
       cardTheme: CardThemeData(
         color: Colors.white,
@@ -25,7 +26,7 @@ class AppTheme {
       ),
       textTheme: TextTheme(
         titleLarge: GoogleFonts.inter(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 32, letterSpacing: -1),
-        titleMedium: GoogleFonts.inter(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 16),
+        titleMedium: GoogleFonts.inter(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 22),
         bodyMedium: GoogleFonts.inter(color: const Color(0xFFA0A0A0), fontSize: 14), // Texto secundario gris
         titleSmall: GoogleFonts.inter(color: Colors.grey[600], fontSize: 11),
       ),
@@ -45,6 +46,7 @@ class AppTheme {
         backgroundColor: Color(0xFF0D0D0D),
         elevation: 0,
       ),
+      dividerColor: Colors.white,
       // CORRECCIÓN: Usamos CardThemeData
       cardTheme: CardThemeData(
         color: const Color(0xFF141414),
@@ -55,7 +57,7 @@ class AppTheme {
       ),
       textTheme: TextTheme(
         titleLarge: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 32, letterSpacing: -1),
-        titleMedium: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16),
+        titleMedium: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 22),
         bodyMedium: GoogleFonts.inter(color: const Color(0xFFA0A0A0), fontSize: 14), // Texto secundario gris
         titleSmall: GoogleFonts.inter(color: Colors.grey[600], fontSize: 11),
       ),

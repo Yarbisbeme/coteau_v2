@@ -1,6 +1,9 @@
 import 'package:coteau_v2/models/wp_post_model.dart';
 import 'package:coteau_v2/services/weather_service.dart';
+import 'package:coteau_v2/ui/widgets/_buildActionCard.dart';
+import 'package:coteau_v2/ui/widgets/_buildDiscoveryTile.dart';
 import 'package:coteau_v2/ui/widgets/_buildWeatherCard.dart';
+import 'package:coteau_v2/ui/widgets/_buildBigCard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
@@ -57,9 +60,10 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Header
                 _buildHeader(theme),
                 const SizedBox(height: 24),
-                
+
                 // Lógica de carga del WeatherCard
                 if (_isLoading)
                   const Center(child: CircularProgressIndicator())
@@ -67,6 +71,52 @@ class _HomeScreenState extends State<HomeScreen> {
                   WeatherCard(weather: _weather!)
                 else
                   const Text("No se pudo cargar el clima", style: TextStyle(color: Colors.white)),
+                const SizedBox(height: 24),
+
+                // --- Identity Tools Section ---
+                const Text("Identity Tools", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    QuickActionCard(
+                      icon: Icons.face_retouching_natural,
+                      title: "Genderize",
+                      subtitle: "Name prediction",
+                      accentColor: const Color(0xFFE91E63), // Rosa neón
+                      onTap: () {},
+                    ),
+                    const SizedBox(width: 16),
+                    QuickActionCard(
+                      icon: Icons.cake,
+                      title: "Agify",
+                      subtitle: "Age estimator",
+                      accentColor: const Color(0xFFFF9800), // Naranja neón
+                      onTap: () {},
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 32),
+
+                // --- Discovery Section ---
+                const Text("Discovery", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                const SizedBox(height: 16),
+                DiscoveryTile(
+                  icon: Icons.school,
+                  title: "University Finder",
+                  subtitle: "Global campus database",
+                  iconColor: const Color(0xFF8BC34A), // Verde neón
+                  onTap: () {},
+                ),
+                DiscoveryTile(
+                  icon: Icons.catching_pokemon,
+                  title: "PokéDex",
+                  subtitle: "Complete entity catalog",
+                  iconColor: const Color(0xFF03A9F4), // Azul neón
+                  onTap: () {},
+                ),
+
               ],
             ),
           ),
@@ -116,4 +166,5 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
+
 }
