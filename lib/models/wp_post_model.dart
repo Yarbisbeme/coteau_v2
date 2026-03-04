@@ -1,42 +1,54 @@
+import 'package:html_unescape/html_unescape.dart';
+
 class WpPost {
-  final int id;
   final String title;
   final String excerpt;
   final String content;
   final String featuredImageUrl;
-  final String date;
   final String authorName;
+  final String date;
 
   WpPost({
-    required this.id,
     required this.title,
     required this.excerpt,
     required this.content,
     required this.featuredImageUrl,
-    required this.date,
     required this.authorName,
+    required this.date,
   });
 
   factory WpPost.fromJson(Map<String, dynamic> json) {
-    // Extraemos la imagen de la estructura _embedded de WordPress
-    String imageUrl = 'https://via.placeholder.com/600x400'; 
-    if (json['_embedded'] != null && 
-        json['_embedded']['wp:featuredmedia'] != null) {
-      imageUrl = json['_embedded']['wp:featuredmedia'][0]['source_url'];
+    // 1. Instanciamos el limpiador de texto
+    var unescape = HtmlUnescape();
+
+    // Lógica para extraer la imagen destacada (si usas el campo incrustado)
+    String imageUrl = '';
+    if (json['_embedded'] != null && json['_embedded']['wp:featuredmedia'] != null) {
+      imageUrl = json['_embedded']['wp:featuredmedia'][0]['source_url'] ?? '';
     }
 
-    // Limpiamos las etiquetas HTML del extracto (excerpt)
-    String cleanExcerpt = json['excerpt']['rendered']
-        .replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), '');
+    // Lógica para el autor
+    String author = 'Admin';
+    if (json['_embedded'] != null && json['_embedded']['author'] != null) {
+      author = json['_embedded']['author'][0]['name'] ?? 'Admin';
+    }
 
     return WpPost(
-      id: json['id'],
-      title: json['title']['rendered'] ?? 'Sin título',
-      excerpt: cleanExcerpt,
+      // 2. Pasamos el título y el extracto por el limpiador "unescape.convert()"
+      title: unescape.convert(json['title']['rendered'] ?? 'Sin título'),
+      
+      // Limpiamos el extracto y le quitamos las etiquetas <p> sobrantes si las tiene
+      excerpt: unescape.convert(json['excerpt']['rendered'] ?? '')
+               .replaceAll('<p>', '')
+               .replaceAll('</p>', '')
+               .trim(),
+               
       content: json['content']['rendered'] ?? '',
       featuredImageUrl: imageUrl,
-      date: json['date'].toString().split('T')[0], // Solo la fecha YYYY-MM-DD
-      authorName: json['_embedded']?['author']?[0]?['name'] ?? 'Admin',
+      authorName: author,
+      
+      // Formateo simple de fecha (cortamos la "T" y la hora que trae WordPress)
+      date: (json['date'] ?? '').split('T')[0], 
     );
   }
 }
