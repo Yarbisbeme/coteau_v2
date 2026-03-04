@@ -5,7 +5,7 @@ import 'package:coteau_v2/services/wp_post_service.dart'; // Importa tu nuevo se
 import 'package:coteau_v2/ui/widgets/_buildActionCard.dart';
 import 'package:coteau_v2/ui/widgets/_buildDiscoveryTile.dart';
 import 'package:coteau_v2/ui/widgets/_buildWeatherCard.dart';
-import 'package:coteau_v2/ui/widgets/_buildNewsCard.dart'; // Importa el widget de noticias
+import 'package:coteau_v2/ui/widgets/_BuildNewsCard.dart'; // Importa el widget de noticias
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
@@ -76,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 else
                   const Text("No se pudo cargar el clima"),
                 
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
 
                 // --- Identity Tools ---
                 Text("Identity Tools", style: theme.textTheme.titleMedium),
@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       title: "Genderize",
                       subtitle: "Name prediction",
                       accentColor: const Color(0xFFE91E63),
-                      onTap: () => Navigator.pushNamed(context, '/gender'),
+                      onTap: () => Navigator.pushNamed(context, '/gender_screen'),
                     ),
                     const SizedBox(width: 16),
                     QuickActionCard(
@@ -96,40 +96,64 @@ class _HomeScreenState extends State<HomeScreen> {
                       title: "Agify",
                       subtitle: "Age estimator",
                       accentColor: const Color(0xFFFF9800),
-                      onTap: () => Navigator.pushNamed(context, '/age'),
+                      onTap: () => Navigator.pushNamed(context, '/age_screen'),
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
 
                 // --- Discovery ---
                 Text("Discovery", style: theme.textTheme.titleMedium),
                 const SizedBox(height: 16),
                 DiscoveryTile(
-                  icon: Icons.school,
-                  title: "University Finder",
-                  subtitle: "Global campus database",
-                  iconColor: const Color(0xFF8BC34A),
-                  onTap: () => Navigator.pushNamed(context, '/universities'),
+                  icon: Icons.work_outline_outlined,
+                  title: "Contratame",
+                  subtitle: "Yo soy el mejor en esto",
+                  iconColor: const Color.fromARGB(255, 244, 79, 3),
+                  onTap: () => Navigator.pushNamed(context, '/contratame_screen'),
+                ),
+                DiscoveryTile(
+                icon: Icons.school,
+                title: "University Finder",
+                subtitle: "Global campus database",
+                iconColor: const Color(0xFF8BC34A),
+                onTap: () => Navigator.pushNamed(context, '/universities_screen'),
                 ),
                 DiscoveryTile(
                   icon: Icons.catching_pokemon,
                   title: "PokéDex",
                   subtitle: "Complete entity catalog",
                   iconColor: const Color(0xFF03A9F4),
-                  onTap: () => Navigator.pushNamed(context, '/pokemon'),
+                  onTap: () => Navigator.pushNamed(context, '/pokemon_screen'),
                 ),
 
                 const SizedBox(height: 32),
 
                 // --- Dev News Section (WordPress API) ---
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Dev News", style: theme.textTheme.titleMedium),
-                    const Text("WORDPRESS API", style: TextStyle(color: Colors.deepPurpleAccent, fontSize: 10, fontWeight: FontWeight.bold)),
-                  ],
+                InkWell( 
+                  onTap: () => Navigator.pushNamed(context, '/news_screen'),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Text("News", style: theme.textTheme.titleMedium),
+                            const SizedBox(width: 8),
+                            // Agregamos una flechita para indicar que es clickeable
+                            Icon(Icons.arrow_forward_ios, size: 14, color: theme.colorScheme.primary), 
+                          ],
+                        ),
+                        const Text(
+                          "WORDPRESS API", 
+                          style: TextStyle(color: Colors.deepPurpleAccent, fontSize: 10, fontWeight: FontWeight.bold)
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 
@@ -154,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         author: post.authorName,
                         date: post.date,
                         onTap: () {
-                          // Lógica para abrir la noticia completa
+                          Navigator.pushNamed(context, '/news_detail_screen', arguments: post);
                         },
                       )).toList(),
                     );

@@ -46,7 +46,12 @@ class WeatherCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, '/weather'); // Navega a la pantalla de clima al tocar la tarjeta
+      },
+      child: Container(
+
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -110,6 +115,7 @@ class WeatherCard extends StatelessWidget {
           
         ],
       ),
+    ),
     );
   }
 }
