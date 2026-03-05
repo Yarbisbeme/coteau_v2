@@ -19,7 +19,6 @@ class _AgeScreenState extends State<AgeScreen> {
 
   Future<void> _handlePrediction() async {
     final name = _nameController.text.trim();
-    
     if (name.isEmpty) {
       setState(() => _errorMessage = 'Por favor, ingresa un nombre.');
       return;
@@ -49,51 +48,61 @@ class _AgeScreenState extends State<AgeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: theme.scaffoldBackgroundColor, // Adaptable al tema
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        elevation: 2,
-        title: const Text('Age Estimator', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 28)),
-        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+        centerTitle: true,
+        title: Text('Age Estimator', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextField(
-              controller: _nameController,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: 'Ingrese su nombre',
-                hintStyle: TextStyle(color: Colors.grey[600]),
-                filled: true,
-                fillColor: const Color(0xFF141414),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.cake, color: Colors.orangeAccent),
-                  onPressed: _handlePrediction,
-                ),
+            // --- BUSCADOR ESTILO BENTO ---
+            Container(
+              decoration: BoxDecoration(
+                color: theme.cardTheme.color,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 5))
+                ],
               ),
-              onSubmitted: (_) => _handlePrediction(),
+              child: TextField(
+                controller: _nameController,
+                style: theme.textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  hintText: 'Ingresa un nombre...',
+                  contentPadding: const EdgeInsets.symmetric(vertical: 20),
+                  border: InputBorder.none,
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.cake, color: Colors.orangeAccent),
+                    onPressed: _handlePrediction,
+                  ),
+                ),
+                onSubmitted: (_) => _handlePrediction(),
+              ),
             ),
             
             const SizedBox(height: 20),
-            
             if (_errorMessage.isNotEmpty)
-              Text(_errorMessage, style: const TextStyle(color: Colors.redAccent, fontSize: 16), textAlign: TextAlign.center),
+              Text(_errorMessage, style: const TextStyle(color: Colors.redAccent)),
 
-            const SizedBox(height: 40),
-
+            // --- RESULTADO CENTRADO ---
             Expanded(
               child: Center(
-                child: _isLoading 
-                    ? const CircularProgressIndicator(color: Colors.orangeAccent)
-                    : _buildResultIndicator(),
+                child: SingleChildScrollView(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    child: _isLoading 
+                        ? const CircularProgressIndicator(color: Colors.orangeAccent)
+                        : _buildResultIndicator(theme),
+                  ),
+                ),
               ),
             ),
           ],
@@ -102,87 +111,53 @@ class _AgeScreenState extends State<AgeScreen> {
     );
   }
 
-  // Lógica de clasificación de edad con UI Premium
-  Widget _buildResultIndicator() {
-    // 1. ESTADO INICIAL: Esperando a que el usuario escriba
+  Widget _buildResultIndicator(ThemeData theme) {
     if (_ageResult == null) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.cake_outlined, size: 100, color: Colors.white.withValues(alpha: 0.05)),
-          const SizedBox(height: 16),
-          Text('Esperando un nombre...', style: TextStyle(color: Colors.grey[700])),
-        ],
-      );
+      return Icon(Icons.hourglass_empty_rounded, size: 100, color: theme.dividerColor.withOpacity(0.1));
     }
 
-    // 2. ESTADO DE ERROR: La API no encontró el nombre
     if (_ageResult!.age == null) {
       return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.all(30),
-            decoration: BoxDecoration(
-              color: Colors.redAccent.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.redAccent.withValues(alpha: 0.5), width: 2),
-            ),
-            child: const Icon(Icons.person_off, size: 80, color: Colors.redAccent),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            '¡Uy, qué misterio!',
-            style: TextStyle(color: Colors.redAccent, fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'El oráculo de datos no pudo\nestimar la edad para este nombre.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey, fontSize: 16),
-          ),
+          Icon(Icons.help_outline_rounded, size: 100, color: Colors.redAccent.withOpacity(0.2)),
+          const SizedBox(height: 16),
+          const Text('No se pudo estimar la edad', style: TextStyle(color: Colors.grey)),
         ],
       );
     }
 
-    // 3. ESTADO DE ÉXITO: Tenemos una edad
     final int age = _ageResult!.age!;
     String status;
     IconData icon;
     Color accentColor;
 
-    // Evaluamos la edad según los requerimientos
     if (age < 30) {
       status = 'Joven';
-      icon = Icons.skateboarding; // Un ícono dinámico para los jóvenes
+      icon = Icons.skateboarding;
       accentColor = Colors.greenAccent;
-    } else if (age >= 30 && age < 60) {
+    } else if (age < 60) {
       status = 'Adulto';
-      icon = Icons.person; // Representa la vida laboral/adulta
+      icon = Icons.person;
       accentColor = Colors.orangeAccent;
     } else {
       status = 'Anciano';
-      icon = Icons.elderly; // Flutter tiene un ícono oficial para esto
+      icon = Icons.elderly;
       accentColor = Colors.purpleAccent;
     }
 
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      key: ValueKey(age),
+      mainAxisSize: MainAxisSize.min,
       children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
+        // Indicador circular con Neón
+        Container(
           padding: const EdgeInsets.all(40),
           decoration: BoxDecoration(
-            color: accentColor.withValues(alpha: 0.1),
+            color: accentColor.withOpacity(0.1),
             shape: BoxShape.circle,
-            border: Border.all(color: accentColor, width: 4),
+            border: Border.all(color: accentColor.withOpacity(0.5), width: 3),
             boxShadow: [
-              BoxShadow(
-                color: accentColor.withValues(alpha: 0.3), 
-                blurRadius: 30, 
-                spreadRadius: 5
-              )
+              BoxShadow(color: accentColor.withOpacity(0.2), blurRadius: 40, spreadRadius: 5)
             ]
           ),
           child: Icon(icon, size: 80, color: accentColor),
@@ -190,26 +165,27 @@ class _AgeScreenState extends State<AgeScreen> {
         const SizedBox(height: 30),
         Text(
           age.toString(),
-          style: const TextStyle(color: Colors.white, fontSize: 64, fontWeight: FontWeight.bold, height: 1),
+          style: theme.textTheme.displayLarge?.copyWith(fontWeight: FontWeight.bold, color: accentColor),
         ),
-        const Text(
+        Text(
           'AÑOS',
-          style: TextStyle(color: Colors.grey, fontSize: 16, letterSpacing: 4, fontWeight: FontWeight.bold),
+          style: theme.textTheme.bodySmall?.copyWith(letterSpacing: 8, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 20),
+        // Etiqueta de estado estilo Bento
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
           decoration: BoxDecoration(
-            color: accentColor.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(20),
+            color: accentColor.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: accentColor.withOpacity(0.3)),
           ),
           child: Text(
             status.toUpperCase(),
-            style: TextStyle(color: accentColor, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 2),
+            style: TextStyle(color: accentColor, fontWeight: FontWeight.bold, letterSpacing: 2),
           ),
         ),
       ],
     );
   }
-
 }

@@ -20,6 +20,9 @@ class DevNewsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Validamos si la URL es válida para evitar el error de "No host specified"
+    final bool hasValidUrl = imageUrl.isNotEmpty && imageUrl.startsWith('http');
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -29,12 +32,15 @@ class DevNewsCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(28),
           image: DecorationImage(
-            image: NetworkImage(imageUrl),
+            image: (hasValidUrl) 
+                ? NetworkImage(imageUrl) 
+                // En lugar de AssetImage, usamos una imagen transparente o pequeña
+                : const NetworkImage("https://via.placeholder.com/1x1/1A1A1A/1A1A1A.png") as ImageProvider,
             fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.6), // Oscurece la imagen para leer el texto
-              BlendMode.darken,
-            ),
+            onError: (exception, stackTrace) {
+              // Si falla, Flutter simplemente no dibujará la imagen de fondo
+              debugPrint("Imagen no disponible");
+            },
           ),
         ),
         child: Container(
@@ -54,7 +60,7 @@ class DevNewsCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF673AB7).withOpacity(0.8), // Estilo 'GUIDE'
+                  color: const Color(0xFF673AB7).withOpacity(0.8),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text("GUIDE", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
@@ -76,10 +82,19 @@ class DevNewsCard extends StatelessWidget {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  const CircleAvatar(radius: 10, backgroundColor: Colors.white24, child: Icon(Icons.person, size: 12, color: Colors.white)),
+                  const CircleAvatar(
+                    radius: 10, 
+                    backgroundColor: Colors.white24, 
+                    child: Icon(Icons.person, size: 12, color: Colors.white)
+                  ),
                   const SizedBox(width: 8),
-                  Text("$author • $date", style: const TextStyle(color: Colors.white54, fontSize: 11)),
-                  const Spacer(),
+                  Expanded(
+                    child: Text(
+                      "$author • $date", 
+                      style: const TextStyle(color: Colors.white54, fontSize: 11),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   const Icon(Icons.arrow_circle_right_outlined, color: Colors.white, size: 24),
                 ],
               ),

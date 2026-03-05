@@ -1,5 +1,6 @@
 
 import 'package:coteau_v2/models/Weather_model.dart';
+import 'package:coteau_v2/ui/screens/weather_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -48,7 +49,12 @@ class WeatherCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/weather'); // Navega a la pantalla de clima al tocar la tarjeta
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => WeatherScreen(weather: weather),
+          ),
+        );  
       },
       child: Container(
 

@@ -18,36 +18,31 @@ class WpPost {
   });
 
   factory WpPost.fromJson(Map<String, dynamic> json) {
-    // 1. Instanciamos el limpiador de texto
+    // Inicializamos como vacío en lugar de una URL externa propensa a CORS
+    String imageUrl = ''; 
     var unescape = HtmlUnescape();
 
-    // Lógica para extraer la imagen destacada (si usas el campo incrustado)
-    String imageUrl = '';
-    if (json['_embedded'] != null && json['_embedded']['wp:featuredmedia'] != null) {
+    if (json['_embedded'] != null && 
+        json['_embedded']['wp:featuredmedia'] != null &&
+        json['_embedded']['wp:featuredmedia'].isNotEmpty) {
       imageUrl = json['_embedded']['wp:featuredmedia'][0]['source_url'] ?? '';
     }
 
-    // Lógica para el autor
     String author = 'Admin';
     if (json['_embedded'] != null && json['_embedded']['author'] != null) {
       author = json['_embedded']['author'][0]['name'] ?? 'Admin';
     }
 
     return WpPost(
-      // 2. Pasamos el título y el extracto por el limpiador "unescape.convert()"
       title: unescape.convert(json['title']['rendered'] ?? 'Sin título'),
-      
-      // Limpiamos el extracto y le quitamos las etiquetas <p> sobrantes si las tiene
       excerpt: unescape.convert(json['excerpt']['rendered'] ?? '')
-               .replaceAll('<p>', '')
-               .replaceAll('</p>', '')
-               .trim(),
-               
+                .replaceAll('<p>', '')
+                .replaceAll('</p>', '')
+                .trim(),
       content: json['content']['rendered'] ?? '',
-      featuredImageUrl: imageUrl,
+      // Si está vacía, el widget usará un AssetImage de respaldo
+      featuredImageUrl: imageUrl, 
       authorName: author,
-      
-      // Formateo simple de fecha (cortamos la "T" y la hora que trae WordPress)
       date: (json['date'] ?? '').split('T')[0], 
     );
   }

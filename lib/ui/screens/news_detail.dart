@@ -142,6 +142,15 @@ class NewsDetailsScreen extends StatelessWidget {
                   "h1": Style(color: theme.colorScheme.onSurface),
                   "h2": Style(color: theme.colorScheme.onSurface),
                   "h3": Style(color: theme.colorScheme.onSurface),
+                  "img": Style(
+                    width: Width(100, Unit.percent), // Obliga a la imagen a no ser más ancha que la pantalla
+                    height: Height.auto(),           // Mantiene la proporción original
+                    margin: Margins.symmetric(vertical: 16.0), // Agrega espacio arriba y abajo
+                  ),
+                  "figure": Style(
+                    margin: Margins.zero,
+                    padding: HtmlPaddings.zero,
+                  ),
                 },
               ),
             ),

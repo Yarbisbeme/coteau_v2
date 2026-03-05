@@ -11,101 +11,63 @@ class GenderScreen extends StatefulWidget {
 
 class _GenderScreenState extends State<GenderScreen> {
   final TextEditingController _nameController = TextEditingController();
-  final GenderService _genderService = GenderService(); // Instanciamos nuestro servicio
+  final GenderService _genderService = GenderService(); 
   
-  GenderModel? _genderResult; // Guardamos el modelo completo
+  GenderModel? _genderResult; 
   bool _isLoading = false;
   String _errorMessage = '';
 
   Future<void> _handlePrediction() async {
     final name = _nameController.text.trim();
-    
-    if (name.isEmpty) {
-      setState(() {
-        _errorMessage = 'Por favor, ingresa un nombre.';
-        _genderResult = null;
-      });
-      return;
-    }
+    if (name.isEmpty) return;
 
     setState(() {
       _isLoading = true;
       _errorMessage = '';
-      _genderResult = null;
     });
 
     try {
-      // Magia: La vista ya no sabe nada de HTTP ni JSON
       final result = await _genderService.fetchGender(name);
-      setState(() {
-        _genderResult = result;
-      });
+      setState(() => _genderResult = result);
     } catch (e) {
-      setState(() {
-        // Limpiamos la excepción para mostrar solo el mensaje al usuario
-        _errorMessage = e.toString().replaceAll('Exception: ', '');
-      });
+      setState(() => _errorMessage = e.toString());
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
   @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: theme.scaffoldBackgroundColor, // Se adapta al modo claro/oscuro
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Gender Predictor', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        iconTheme: const IconThemeData(color: Colors.white),
+        centerTitle: true,
+        title: Text('Gender Predictor', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-
-            TextField(
-              controller: _nameController,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: 'Ej. Yarbis, Irma, Carlos...',
-                hintStyle: TextStyle(color: Colors.grey[600]),
-                filled: true,
-                fillColor: const Color(0xFF141414),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.search, color: Colors.blueAccent),
-                  onPressed: _handlePrediction,
-                ),
-              ),
-              onSubmitted: (_) => _handlePrediction(),
-            ),
-            
+            _buildSearchInput(theme),
             const SizedBox(height: 20),
-            
             if (_errorMessage.isNotEmpty)
-              Text(_errorMessage, style: const TextStyle(color: Colors.redAccent, fontSize: 16), textAlign: TextAlign.center),
-
-            const SizedBox(height: 40),
-
+              Text(_errorMessage, style: const TextStyle(color: Colors.redAccent)),
+            
+            // Usamos Expanded + Center para que el resultado siempre esté en el centro vertical
             Expanded(
               child: Center(
-                child: _isLoading 
-                    ? const CircularProgressIndicator(color: Colors.blueAccent)
-                    : _buildResultIndicator(),
+                child: SingleChildScrollView(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    child: _isLoading 
+                      ? const CircularProgressIndicator()
+                      : _buildResultContent(theme),
+                  ),
+                ),
               ),
             ),
           ],
@@ -114,60 +76,99 @@ class _GenderScreenState extends State<GenderScreen> {
     );
   }
 
-  Widget _buildResultIndicator() {
-    // Si no hemos buscado nada aún
+  Widget _buildSearchInput(ThemeData theme) {
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardTheme.color, // Color dinámico
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          )
+        ],
+      ),
+      child: TextField(
+        controller: _nameController,
+        style: theme.textTheme.bodyLarge,
+        textAlign: TextAlign.center,
+        decoration: InputDecoration(
+          hintText: 'Enter name...',
+          contentPadding: const EdgeInsets.symmetric(vertical: 20),
+          border: InputBorder.none,
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.auto_awesome),
+            onPressed: _handlePrediction,
+          ),
+        ),
+        onSubmitted: (_) => _handlePrediction(),
+      ),
+    );
+  }
+
+  Widget _buildResultContent(ThemeData theme) {
     if (_genderResult == null) {
-      return const Icon(Icons.face, size: 100, color: Color(0xFF222222));
+      return Icon(Icons.face_outlined, size: 100, color: theme.dividerColor.withOpacity(0.2));
     }
 
-    Color bgColor;
-    IconData icon;
-    String label;
-
-    // Evaluamos usando la propiedad del modelo
-    if (_genderResult!.gender == 'male') {
-      bgColor = Colors.blue; 
-      icon = Icons.male;
-      label = 'HOMBRE MASCULINO';
-    } else if (_genderResult!.gender == 'female') {
-      bgColor = Colors.pink; 
-      icon = Icons.female;
-      label = 'MUJER FEMENINA';
-    } else {
-      bgColor = Colors.grey;
-      icon = Icons.question_mark;
-      label = 'DESCONOCIDO (Ta raro mio)';
-    }
+    final isMale = _genderResult!.gender == 'male';
+    final accentColor = isMale ? const Color(0xFF03A9F4) : const Color(0xFFE91E63);
+    final icon = isMale ? Icons.male_rounded : Icons.female_rounded;
 
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-          padding: const EdgeInsets.all(60),
+        // Círculo de género
+        Container(
+          padding: const EdgeInsets.all(40),
           decoration: BoxDecoration(
-            color: bgColor.withValues(alpha: 0.2),
+            color: accentColor.withOpacity(0.1),
             shape: BoxShape.circle,
-            border: Border.all(color: bgColor, width: 4),
-            boxShadow: [
-              BoxShadow(
-                color: bgColor.withValues(alpha: 0.5),
-                blurRadius: 30,
-                spreadRadius: 5,
-              )
-            ]
+            border: Border.all(color: accentColor.withOpacity(0.3), width: 2),
           ),
-          child: Icon(icon, size: 120, color: bgColor),
+          child: Icon(icon, size: 100, color: accentColor),
         ),
-        const SizedBox(height: 34),
+        const SizedBox(height: 24),
         Text(
-          label,
-          style: TextStyle(color: bgColor, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
-          textAlign: TextAlign.center,
+          _genderResult!.name.toUpperCase(),
+          style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w900, letterSpacing: 2),
+        ),
+        Text(
+          isMale ? "MASCULINE" : "FEMININE",
+          style: TextStyle(color: accentColor, fontWeight: FontWeight.bold, letterSpacing: 4, fontSize: 14),
+        ),
+        const SizedBox(height: 40),
+        
+        // Tarjetas Bento de estadísticas
+        Row(
+          children: [
+            _buildStatCard(theme, "Probability", "${((_genderResult!.probability ?? 0.0) * 100).toInt()}%", accentColor),
+            const SizedBox(width: 16),
+            _buildStatCard(theme, "Sample Size", _genderResult!.count.toString(), Colors.blueGrey),
+          ],
         ),
       ],
     );
   }
 
+  Widget _buildStatCard(ThemeData theme, String label, String value, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: theme.cardTheme.color,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: theme.dividerColor.withOpacity(0.05)),
+        ),
+        child: Column(
+          children: [
+            Text(label, style: theme.textTheme.bodySmall),
+            const SizedBox(height: 8),
+            Text(value, style: TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+    );
+  }
 }
